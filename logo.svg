@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="124" height="124">
+  <defs>
+    <radialGradient id="d" cx="50%" cy="0%" r="102.112%" fx="50%" fy="0%" gradientTransform="matrix(0 .9605 -1 0 .5 -.48)">
+      <stop offset="0%" stop-color="#FFF"/>
+      <stop offset="100%" stop-color="#FFF" stop-opacity=".41"/>
+    </radialGradient>
+    <linearGradient id="a" x1="50%" x2="50%" y1="0%" y2="111.198%">
+      <stop offset="0%" stop-color="#0091FF"/>
+      <stop offset="100%" stop-color="#00227F"/>
+    </linearGradient>
+    <filter id="b" width="152%" height="150%" x="-26%" y="-20.8%" filterUnits="objectBoundingBox">
+      <feOffset dy="3" in="SourceAlpha" result="shadowOffsetOuter1"/>
+      <feGaussianBlur in="shadowOffsetOuter1" result="shadowBlurOuter1" stdDeviation="5.5"/>
+      <feColorMatrix in="shadowBlurOuter1" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.289417614 0"/>
+    </filter>
+    <path id="c" d="M86.886 25.324a8.23 8.23 0 0 1 7.533 4.91l.053.123a8.186 8.186 0 0 1 .706 3.337V58.03c0 .936-.156 1.836-.445 2.674l-.064.179a8.23 8.23 0 0 1-7.783 5.55H74.761L92.56 83.018a8.218 8.218 0 0 1 .406 11.62 8.232 8.232 0 0 1-11.629.406L48.361 64.317a8.199 8.199 0 0 1-2.616-6.083l.006-.294a8.225 8.225 0 0 1 8.224-7.95H74.61a4.111 4.111 0 0 0 0-8.223H53.975c-4.544 0-8.228-3.68-8.228-8.222 0-4.54 3.684-8.221 8.228-8.221h32.911ZM34.228 97.348c4.544 0 8.228-3.681 8.228-8.222 0-4.541-3.684-8.222-8.228-8.222S26 84.584 26 89.126c0 4.54 3.684 8.222 8.228 8.222Z"/>
+  </defs>
+  <g fill="none" fill-rule="evenodd">
+    <path fill="url(#a)" d="M51.385 0h20.319c16.954 0 23.782 1.9 30.45 5.466 6.67 3.566 11.903 8.8 15.47 15.468 3.565 6.668 5.465 13.497 5.465 30.45v20.231c0 16.954-1.9 23.783-5.466 30.451-3.566 6.669-8.8 11.902-15.468 15.468C95.486 121.101 88.658 123 71.704 123h-20.32c-16.953 0-23.782-1.9-30.45-5.466-6.669-3.566-11.902-8.8-15.468-15.468C1.899 95.398 0 88.57 0 71.616V51.384C0 34.43 1.9 27.602 5.466 20.934c3.566-6.669 8.8-11.902 15.468-15.468C27.602 1.899 34.43 0 51.384 0Z" transform="translate(.443)"/>
+    <g transform="translate(.443)">
+      <use xlink:href="#c" fill="#000" filter="url(#b)"/>
+      <use xlink:href="#c" fill="url(#d)"/>
+    </g>
+  </g>
+</svg>

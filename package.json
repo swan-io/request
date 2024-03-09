@@ -1,0 +1,49 @@
+{
+  "name": "@swan-io/request",
+  "version": "1.0.0",
+  "description": "Wrapper for XMLHttpRequest with better data-structures",
+  "main": "dist/Request.js",
+  "module": "dist/Request.mjs",
+  "source": "src/Request.ts",
+  "types": "dist/Request.d.ts",
+  "repository": "git@github.com:swan-io/request.git",
+  "author": "Matthias Le Brun <bloodyowl@swan.io>",
+  "license": "MIT",
+  "files": [
+    "LICENSE",
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "typescript",
+    "boxed",
+    "request",
+    "xhr"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "prettier": {
+    "trailingComma": "all"
+  },
+  "scripts": {
+    "build": "yarn clean && microbundle -f cjs,es",
+    "clean": "rm -rf dist",
+    "format": "prettier '**/*' -u -w",
+    "prepack": "yarn test && yarn build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@swan-io/boxed": "^2.0.1",
+    "jsdom": "^24.0.0",
+    "microbundle": "^0.15.1",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.2",
+    "vitest": "^1.3.1"
+  },
+  "peerDependencies": {
+    "@swan-io/boxed": ">=2.0.1"
+  }
+}
