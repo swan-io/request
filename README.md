@@ -88,11 +88,22 @@ useEffect(() => {
 - `onProgress`: event triggered at different times when the payload is being sent
 - `timeout`: number
 
-#### emptyToError
+#### Return value
+
+Returns a `Future<Result<Response<T>, NetworkError | TimeoutError>>`, where `Response<T>` has the following properties:
+
+- `status`: `number`
+- `ok`: `boolean`
+- `response`: `Option<T>`
+- `xhr`: `XMLHttpRequest`
+
+`T` is the type associated with the `responseType` provided in the `config` object.
+
+### emptyToError
 
 Helper to use with `mapOkToResult` to consider empty response as an error.
 
-#### badStatusToError
+### badStatusToError
 
 Helper to use with `mapOkToResult` to consider a status outside of the 200-299 range as an error.
 
