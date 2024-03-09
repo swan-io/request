@@ -35,7 +35,7 @@ type Config<T extends ResponseType> = {
   timeout?: number;
 };
 
-type Response<T> = {
+export type Response<T> = {
   status: number;
   ok: boolean;
   response: Option<T>;
