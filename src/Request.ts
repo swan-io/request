@@ -8,8 +8,6 @@ type JsonArray = JsonValue[] | readonly JsonValue[];
 type JsonPrimitive = string | number | boolean | null;
 type JsonValue = JsonPrimitive | JsonObject | JsonArray;
 
-// The type system allows us infer the response type from the requested `responseType`
-type ResponseType = "text" | "arraybuffer" | "document" | "blob" | "json";
 type ResponseTypeMap = {
   text: string;
   arraybuffer: ArrayBuffer;
@@ -17,6 +15,9 @@ type ResponseTypeMap = {
   blob: Blob;
   json: JsonValue;
 };
+
+// The type system allows us infer the response type from the requested `responseType`
+type ResponseType = keyof ResponseTypeMap;
 
 type Method = "GET" | "POST" | "OPTIONS" | "PATCH" | "PUT" | "DELETE";
 
