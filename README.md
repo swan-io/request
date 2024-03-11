@@ -35,7 +35,7 @@ Request.make({ url: "/api/health" }).onResolve(console.log);
 // Result.Ok({status: 200, ok: true, response: Option.Some("{\"ok\":true}")})
 
 // Timeout
-Request.make({ url: "/api/health", timeout: 50 }).onResolve(console.log);
+Request.make({ url: "/api/health", timeout: 2000 }).onResolve(console.log);
 // Result.Error(TimeoutError)
 
 // Network error

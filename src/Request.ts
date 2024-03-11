@@ -10,6 +10,7 @@ type JsonValue = JsonPrimitive | JsonObject | JsonArray;
 
 // The type system allows us infer the response type from the requested `responseType`
 type ResponseType = "text" | "arraybuffer" | "document" | "blob" | "json";
+
 type ResponseTypeMap = {
   text: string;
   arraybuffer: ArrayBuffer;
