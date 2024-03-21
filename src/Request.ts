@@ -21,8 +21,27 @@ type ResponseTypeMap = {
 
 type Method = "GET" | "POST" | "OPTIONS" | "PATCH" | "PUT" | "DELETE";
 
-class NetworkError extends Error {}
-class TimeoutError extends Error {}
+export class NetworkError extends Error {
+  url: string;
+  constructor(url: string) {
+    super(`Request to ${url} failed`);
+    this.url = url;
+  }
+}
+
+export class TimeoutError extends Error {
+  url: string;
+  timeout?: number;
+  constructor(url: string, timeout?: number) {
+    if (timeout == undefined) {
+      super(`Request to ${url} timed out`);
+    } else {
+      super(`Request to ${url} timed out (> ${timeout}ms)`);
+    }
+    this.url = url;
+    this.timeout = timeout;
+  }
+}
 
 type Config<T extends ResponseType> = {
   url: string;
@@ -37,6 +56,7 @@ type Config<T extends ResponseType> = {
 };
 
 export type Response<T> = {
+  url: string;
   status: number;
   ok: boolean;
   response: Option<T>;
@@ -80,12 +100,12 @@ const make = <T extends ResponseType = "text">({
 
     const onError = () => {
       cleanupEvents();
-      resolve(Result.Error(new NetworkError()));
+      resolve(Result.Error(new NetworkError(url)));
     };
 
     const onTimeout = () => {
       cleanupEvents();
-      resolve(Result.Error(new TimeoutError()));
+      resolve(Result.Error(new TimeoutError(url, timeout)));
     };
 
     const onLoad = () => {
@@ -97,6 +117,7 @@ const make = <T extends ResponseType = "text">({
 
       resolve(
         Result.Ok({
+          url,
           status,
           // Uses the same heuristics as the built-in `Response`
           ok: status >= 200 && status < 300,
@@ -138,7 +159,17 @@ const make = <T extends ResponseType = "text">({
   });
 };
 
-class BadStatusError extends Error {}
+export class BadStatusError extends Error {
+  url: string;
+  status: number;
+  response: unknown;
+  constructor(url: string, status: number, response?: unknown) {
+    super(`Request to ${url} gave status ${status}`);
+    this.url = url;
+    this.status = status;
+    this.response = response;
+  }
+}
 
 export const badStatusToError = <T>(
   response: Response<T>,
@@ -146,14 +177,24 @@ export const badStatusToError = <T>(
   return response.ok
     ? Result.Ok(response)
     : Result.Error(
-        new BadStatusError(`Received HTTP status ${response.status}`),
+        new BadStatusError(
+          response.url,
+          response.status,
+          response.response.toUndefined(),
+        ),
       );
 };
 
-class EmptyResponseError extends Error {}
+export class EmptyResponseError extends Error {
+  url: string;
+  constructor(url: string) {
+    super(`Request to ${url} gave an empty response`);
+    this.url = url;
+  }
+}
 
 export const emptyToError = <T>(response: Response<T>) => {
-  return response.response.toResult(new EmptyResponseError());
+  return response.response.toResult(new EmptyResponseError(response.url));
 };
 
 export const Request = {
