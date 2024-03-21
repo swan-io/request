@@ -1,3 +1,9 @@
+# 1.0.2
+
+## Changes
+
+- Export error types
+
 # 1.0.1
 
 ## Changes
