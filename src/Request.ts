@@ -31,7 +31,7 @@ export class NetworkError extends Error {
 
 export class TimeoutError extends Error {
   url: string;
-  timeout?: number;
+  timeout: number | undefined;
   constructor(url: string, timeout?: number) {
     if (timeout == undefined) {
       super(`Request to ${url} timed out`);
