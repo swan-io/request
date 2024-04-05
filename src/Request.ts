@@ -169,6 +169,8 @@ export class BadStatusError extends Error {
   response: unknown;
   constructor(url: string, status: number, response?: unknown) {
     super(`Request to ${url} gave status ${status}`);
+    Object.setPrototypeOf(this, BadStatusError.prototype);
+    this.name = "BadStatusError";
     this.url = url;
     this.status = status;
     this.response = response;
