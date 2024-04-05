@@ -25,6 +25,8 @@ export class NetworkError extends Error {
   url: string;
   constructor(url: string) {
     super(`Request to ${url} failed`);
+    Object.setPrototypeOf(this, NetworkError.prototype);
+    this.name = "NetworkError";
     this.url = url;
   }
 }
@@ -38,6 +40,8 @@ export class TimeoutError extends Error {
     } else {
       super(`Request to ${url} timed out (> ${timeout}ms)`);
     }
+    Object.setPrototypeOf(this, TimeoutError.prototype);
+    this.name = "TimeoutError";
     this.url = url;
     this.timeout = timeout;
   }
@@ -189,6 +193,8 @@ export class EmptyResponseError extends Error {
   url: string;
   constructor(url: string) {
     super(`Request to ${url} gave an empty response`);
+    Object.setPrototypeOf(this, EmptyResponseError.prototype);
+    this.name = "EmptyResponseError";
     this.url = url;
   }
 }
