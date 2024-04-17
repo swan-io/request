@@ -87,7 +87,7 @@ useEffect(() => {
 - `url`: string
 - `method`: `GET` (default), `POST`, `OPTIONS`, `PATCH`, `PUT` or `DELETE`
 - `responseType`:
-  - `text`: (default) response will be a `string`
+  - `text`: response will be a `string`
   - `arraybuffer`: response will be a `ArrayBuffer`
   - `document`: response will be `Document`
   - `blob`: response will be `Blob`
