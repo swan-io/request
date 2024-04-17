@@ -23,9 +23,11 @@ type Method = "GET" | "POST" | "OPTIONS" | "PATCH" | "PUT" | "DELETE";
 
 export class NetworkError extends Error {
   url: string;
+
   constructor(url: string) {
     super(`Request to ${url} failed`);
     Object.setPrototypeOf(this, NetworkError.prototype);
+
     this.name = "NetworkError";
     this.url = url;
   }
@@ -34,13 +36,11 @@ export class NetworkError extends Error {
 export class TimeoutError extends Error {
   url: string;
   timeout: number | undefined;
+
   constructor(url: string, timeout?: number) {
-    if (timeout == undefined) {
-      super(`Request to ${url} timed out`);
-    } else {
-      super(`Request to ${url} timed out (> ${timeout}ms)`);
-    }
+    super(`Request to ${url} timed out` + (timeout ? ` (> ${timeout}ms)` : ""));
     Object.setPrototypeOf(this, TimeoutError.prototype);
+
     this.name = "TimeoutError";
     this.url = url;
     this.timeout = timeout;
@@ -49,34 +49,34 @@ export class TimeoutError extends Error {
 
 type Config<T extends ResponseType> = {
   url: string;
-  method?: Method;
-  responseType?: T;
-  body?: Document | XMLHttpRequestBodyInit;
   headers?: Record<string, string>;
-  withCredentials?: boolean;
-  onLoadStart?: (event: ProgressEvent<XMLHttpRequestEventTarget>) => void;
-  onProgress?: (event: ProgressEvent<XMLHttpRequestEventTarget>) => void;
+  body?: Document | XMLHttpRequestBodyInit;
+  method?: Method;
+  responseType: T;
   timeout?: number;
+  withCredentials?: boolean;
+  onProgress?: (event: ProgressEvent<XMLHttpRequestEventTarget>) => void;
+  onLoadStart?: (event: ProgressEvent<XMLHttpRequestEventTarget>) => void;
 };
 
 export type Response<T> = {
-  url: string;
-  status: number;
   ok: boolean;
   response: Option<T>;
+  status: number;
+  url: string;
   xhr: XMLHttpRequest;
 };
 
-const make = <T extends ResponseType = "text">({
+const make = <T extends ResponseType>({
   url,
+  headers,
+  body,
   method = "GET",
   responseType,
-  body,
-  headers,
-  withCredentials = false,
-  onLoadStart,
-  onProgress,
   timeout,
+  withCredentials = false,
+  onProgress,
+  onLoadStart,
 }: Config<T>): Future<
   Result<Response<ResponseTypeMap[T]>, NetworkError | TimeoutError>
 > => {
@@ -85,18 +85,20 @@ const make = <T extends ResponseType = "text">({
   >((resolve) => {
     const xhr = new XMLHttpRequest();
     xhr.withCredentials = withCredentials;
+
     // Only allow asynchronous requests
     xhr.open(method, url, true);
+
     // If `responseType` is unspecified, XHR defaults to `text`
-    if (responseType != undefined) {
+    if (responseType != null) {
       xhr.responseType = responseType;
     }
 
-    if (timeout != undefined) {
+    if (timeout != null) {
       xhr.timeout = timeout;
     }
 
-    if (headers != undefined) {
+    if (headers != null) {
       Dict.entries(headers).forEach(([key, value]) =>
         xhr.setRequestHeader(key, value),
       );
@@ -114,6 +116,7 @@ const make = <T extends ResponseType = "text">({
 
     const onLoad = () => {
       cleanupEvents();
+
       const status = xhr.status;
       // Response can be empty, which is why we represent it as an option.
       // We provide the `emptyToError` helper to handle this case.
@@ -135,10 +138,11 @@ const make = <T extends ResponseType = "text">({
       xhr.removeEventListener("error", onError);
       xhr.removeEventListener("load", onLoad);
       xhr.removeEventListener("timeout", onTimeout);
-      if (onLoadStart != undefined) {
+
+      if (onLoadStart != null) {
         xhr.removeEventListener("loadstart", onLoadStart);
       }
-      if (onProgress != undefined) {
+      if (onProgress != null) {
         xhr.removeEventListener("progress", onProgress);
       }
     };
@@ -146,10 +150,11 @@ const make = <T extends ResponseType = "text">({
     xhr.addEventListener("error", onError);
     xhr.addEventListener("load", onLoad);
     xhr.addEventListener("timeout", onTimeout);
-    if (onLoadStart != undefined) {
+
+    if (onLoadStart != null) {
       xhr.addEventListener("loadstart", onLoadStart);
     }
-    if (onProgress != undefined) {
+    if (onProgress != null) {
       xhr.addEventListener("progress", onProgress);
     }
 
@@ -167,9 +172,11 @@ export class BadStatusError extends Error {
   url: string;
   status: number;
   response: unknown;
+
   constructor(url: string, status: number, response?: unknown) {
     super(`Request to ${url} gave status ${status}`);
     Object.setPrototypeOf(this, BadStatusError.prototype);
+
     this.name = "BadStatusError";
     this.url = url;
     this.status = status;
@@ -193,9 +200,11 @@ export const badStatusToError = <T>(
 
 export class EmptyResponseError extends Error {
   url: string;
+
   constructor(url: string) {
     super(`Request to ${url} gave an empty response`);
     Object.setPrototypeOf(this, EmptyResponseError.prototype);
+
     this.name = "EmptyResponseError";
     this.url = url;
   }
@@ -205,6 +214,4 @@ export const emptyToError = <T>(response: Response<T>) => {
   return response.response.toResult(new EmptyResponseError(response.url));
 };
 
-export const Request = {
-  make,
-};
+export const Request = { make };
