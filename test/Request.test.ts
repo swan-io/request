@@ -3,7 +3,10 @@ import { Request, emptyToError } from "../src/Request";
 import { Option, Result } from "@swan-io/boxed";
 
 test("Request: basic", async () => {
-  return Request.make({ url: "data:text/plain,hello!" }).tap((value) => {
+  return Request.make({
+    url: "data:text/plain,hello!",
+    responseType: "text",
+  }).tap((value) => {
     expect(value.map((value) => value.status)).toEqual(Result.Ok(200));
     expect(value.map((value) => value.response)).toEqual(
       Result.Ok(Option.Some("hello!")),
@@ -13,7 +16,10 @@ test("Request: basic", async () => {
 });
 
 test("Request: emptyToError", async () => {
-  return Request.make({ url: "data:text/plain,hello!" })
+  return Request.make({
+    url: "data:text/plain,hello!",
+    responseType: "text",
+  })
     .mapOkToResult(emptyToError)
     .tap((value) => {
       expect(value).toEqual(Result.Ok("hello!"));
@@ -21,7 +27,10 @@ test("Request: emptyToError", async () => {
 });
 
 test("Request: JSON as text", async () => {
-  return Request.make({ url: 'data:text/json,{"ok":true}' }).tap((value) => {
+  return Request.make({
+    url: 'data:text/json,{"ok":true}',
+    responseType: "text",
+  }).tap((value) => {
     expect(value.map((value) => value.status)).toEqual(Result.Ok(200));
     expect(value.map((value) => value.response)).toEqual(
       Result.Ok(Option.Some('{"ok":true}')),
