@@ -1,3 +1,9 @@
+# 1.0.5
+
+## Changes
+
+- Update Boxed
+
 # 1.0.4
 
 ## Changes
