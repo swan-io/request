@@ -1,6 +1,6 @@
 {
   "name": "@swan-io/request",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Wrapper for XMLHttpRequest with better data-structures",
   "main": "dist/Request.js",
   "module": "dist/Request.mjs",
