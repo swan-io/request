@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { Request, emptyToError } from "../src/Request";
-import { Option, Result } from "@swan-io/boxed";
+import { Future, Option, Result } from "@swan-io/boxed";
 
 test("Request: basic", async () => {
   return Request.make({ url: "data:text/plain,hello!" }).tap((value) => {
