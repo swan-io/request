@@ -62,6 +62,15 @@ type Config<T extends ResponseType> = {
   headers?: Record<string, string>;
   credentials?: RequestCredentials;
   timeout?: number;
+  cache?: RequestCache;
+  integrity?: string;
+  keepalive?: boolean;
+  mode?: RequestMode;
+  priority?: RequestPriority;
+  redirect?: RequestRedirect;
+  referrer?: string;
+  referrerPolicy?: ReferrerPolicy;
+  window?: null;
 };
 
 export type Response<T> = {
@@ -71,14 +80,25 @@ export type Response<T> = {
   response: Option<T>;
 };
 
+const resolvedPromise = Promise.resolve();
+
 const make = <T extends ResponseType>({
   url,
-  method = "GET",
+  method,
   type,
-  body = null,
-  headers = {},
-  credentials = "same-origin",
+  body,
+  headers,
+  credentials,
   timeout,
+  cache,
+  integrity,
+  keepalive,
+  mode,
+  priority,
+  redirect,
+  referrer,
+  referrerPolicy,
+  window,
 }: Config<T>): Future<
   Result<Response<ResponseTypeMap[T]>, NetworkError | TimeoutError>
 > => {
@@ -100,6 +120,15 @@ const make = <T extends ResponseType>({
         headers,
         signal: controller.signal,
         body,
+        cache,
+        integrity,
+        keepalive,
+        mode,
+        priority,
+        redirect,
+        referrer,
+        referrerPolicy,
+        window,
       });
 
       let payload;
@@ -136,14 +165,14 @@ const make = <T extends ResponseType>({
       (response) => resolve(Result.Ok(response)),
       (error) => {
         if (error instanceof CanceledError) {
-          return Promise.resolve();
+          return resolvedPromise;
         }
         if (error instanceof TimeoutError) {
           resolve(Result.Error(error));
-          return Promise.resolve();
+          return resolvedPromise;
         }
         resolve(Result.Error(new NetworkError(url)));
-        return Promise.resolve();
+        return resolvedPromise;
       },
     );
 

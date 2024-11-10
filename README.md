@@ -21,9 +21,8 @@ $ npm install --save @swan-io/request @swan-io/boxed
 - Has a **strong contract** with data-structures from [Boxed](https://swan-io.github.io/boxed/) (`Future`, `Result` & `Option`)
 - Makes the request **easily cancellable** with `Future` API
 - Gives **freedom of interpretation for response status**
-- Handles `onLoadStart` & `onProgress` events
 - Handles **timeouts**
-- Types the response using the provided `responseType`
+- Types the response using the provided `type`
 
 ## Getting started
 
@@ -75,17 +74,15 @@ useEffect(() => {
 
 - `url`: string
 - `method`: `GET` (default), `POST`, `OPTIONS`, `PATCH`, `PUT` or `DELETE`
-- `responseType`:
+- `type`:
   - `text`: (default) response will be a `string`
   - `arraybuffer`: response will be a `ArrayBuffer`
-  - `document`: response will be `Document`
   - `blob`: response will be `Blob`
   - `json`: response will be a JSON value
 - `body`: request body
 - `headers`: a record containing the headers
-- `withCredentials`: boolean
+- `creatials`: `omit`, `same-origin` or `include`
 - `onLoadStart`: event triggered on load start
-- `onProgress`: event triggered at different times when the payload is being sent
 - `timeout`: number
 
 #### Return value
