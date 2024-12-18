@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { beforeEach, expect, test } from "vitest";
 import { Request, emptyToError } from "../src/Request";
 import { Option, Result } from "@swan-io/boxed";
 
@@ -58,4 +58,16 @@ test("Request: invalid JSON as JSON", async () => {
     );
     expect(value.map((value) => value.ok)).toEqual(Result.Ok(true));
   });
+});
+
+test("Request: invalid JSON as JSON", async () => {
+  const request = Request.make({
+    url: "https://api.punkapi.com/v2/beers",
+    type: "text",
+  });
+
+  request.cancel();
+
+  // @ts-expect-error
+  expect(request._state.tag).toBe("Cancelled");
 });
