@@ -1,3 +1,9 @@
+# 2.0.0
+
+## Changes
+
+- Use `fetch` rather than `XMLHttpRequest` for node compat (112ab0e)
+
 # 1.0.6
 
 ## Changes
