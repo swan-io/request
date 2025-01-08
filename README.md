@@ -91,7 +91,7 @@ Returns a `Future<Result<Response<T>, NetworkError | TimeoutError>>`, where `Res
 - `status`: `number`
 - `ok`: `boolean`
 - `response`: `Option<T>`
-- `xhr`: `XMLHttpRequest`
+- `url`: `string`
 
 `T` is the type associated with the `responseType` provided in the `config` object.
 
