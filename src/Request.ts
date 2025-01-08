@@ -1,4 +1,4 @@
-import { Dict, Future, Option, Result } from "@swan-io/boxed";
+import { Future, Option, Result } from "@swan-io/boxed";
 
 // Copied from type-fest, to avoid adding a dependency
 type JsonObject = { [Key in string]: JsonValue } & {
@@ -9,12 +9,11 @@ type JsonPrimitive = string | number | boolean | null;
 type JsonValue = JsonPrimitive | JsonObject | JsonArray;
 
 // The type system allows us infer the response type from the requested `responseType`
-type ResponseType = "text" | "arraybuffer" | "document" | "blob" | "json";
+type ResponseType = "text" | "arraybuffer" | "blob" | "json";
 
 type ResponseTypeMap = {
   text: string;
   arraybuffer: ArrayBuffer;
-  document: Document;
   blob: Blob;
   json: JsonValue;
 };
@@ -47,16 +46,31 @@ export class TimeoutError extends Error {
   }
 }
 
+export class CanceledError extends Error {
+  constructor() {
+    super();
+    Object.setPrototypeOf(this, CanceledError.prototype);
+    this.name = "CanceledError";
+  }
+}
+
 type Config<T extends ResponseType> = {
   url: string;
   method?: Method;
-  responseType?: T;
-  body?: Document | XMLHttpRequestBodyInit;
+  type: T;
+  body?: BodyInit | null;
   headers?: Record<string, string>;
-  withCredentials?: boolean;
-  onLoadStart?: (event: ProgressEvent<XMLHttpRequestEventTarget>) => void;
-  onProgress?: (event: ProgressEvent<XMLHttpRequestEventTarget>) => void;
+  credentials?: RequestCredentials;
   timeout?: number;
+  cache?: RequestCache;
+  integrity?: string;
+  keepalive?: boolean;
+  mode?: RequestMode;
+  priority?: RequestPriority;
+  redirect?: RequestRedirect;
+  referrer?: string;
+  referrerPolicy?: ReferrerPolicy;
+  window?: null;
 };
 
 export type Response<T> = {
@@ -64,101 +78,106 @@ export type Response<T> = {
   status: number;
   ok: boolean;
   response: Option<T>;
-  xhr: XMLHttpRequest;
 };
 
-const make = <T extends ResponseType = "text">({
+const resolvedPromise = Promise.resolve();
+
+const make = <T extends ResponseType>({
   url,
-  method = "GET",
-  responseType,
+  method,
+  type,
   body,
   headers,
-  withCredentials = false,
-  onLoadStart,
-  onProgress,
+  credentials,
   timeout,
+  cache,
+  integrity,
+  keepalive,
+  mode,
+  priority,
+  redirect,
+  referrer,
+  referrerPolicy,
+  window,
 }: Config<T>): Future<
   Result<Response<ResponseTypeMap[T]>, NetworkError | TimeoutError>
 > => {
   return Future.make<
     Result<Response<ResponseTypeMap[T]>, NetworkError | TimeoutError>
   >((resolve) => {
-    const xhr = new XMLHttpRequest();
-    xhr.withCredentials = withCredentials;
-    // Only allow asynchronous requests
-    xhr.open(method, url, true);
-    // If `responseType` is unspecified, XHR defaults to `text`
-    if (responseType != undefined) {
-      xhr.responseType = responseType;
+    const controller = new AbortController();
+
+    if (timeout) {
+      setTimeout(() => {
+        controller.abort(new TimeoutError(url, timeout));
+      }, timeout);
     }
 
-    if (timeout != undefined) {
-      xhr.timeout = timeout;
-    }
+    const init = async () => {
+      const res = await fetch(url, {
+        method,
+        credentials,
+        headers,
+        signal: controller.signal,
+        body,
+        cache,
+        integrity,
+        keepalive,
+        mode,
+        priority,
+        redirect,
+        referrer,
+        referrerPolicy,
+        window,
+      });
 
-    if (headers != undefined) {
-      Dict.entries(headers).forEach(([key, value]) =>
-        xhr.setRequestHeader(key, value),
-      );
-    }
-
-    const onError = () => {
-      cleanupEvents();
-      resolve(Result.Error(new NetworkError(url)));
-    };
-
-    const onTimeout = () => {
-      cleanupEvents();
-      resolve(Result.Error(new TimeoutError(url, timeout)));
-    };
-
-    const onLoad = () => {
-      cleanupEvents();
-      const status = xhr.status;
-      // Response can be empty, which is why we represent it as an option.
-      // We provide the `emptyToError` helper to handle this case.
-      const response = Option.fromNullable(xhr.response);
-
-      resolve(
-        Result.Ok({
-          url,
-          status,
-          // Uses the same heuristics as the built-in `Response`
-          ok: status >= 200 && status < 300,
-          response,
-          xhr,
-        }),
-      );
-    };
-
-    const cleanupEvents = () => {
-      xhr.removeEventListener("error", onError);
-      xhr.removeEventListener("load", onLoad);
-      xhr.removeEventListener("timeout", onTimeout);
-      if (onLoadStart != undefined) {
-        xhr.removeEventListener("loadstart", onLoadStart);
+      let payload;
+      try {
+        if (type === "arraybuffer") {
+          payload = Option.Some(await res.arrayBuffer());
+        }
+        if (type === "blob") {
+          payload = Option.Some(await res.blob());
+        }
+        if (type === "json") {
+          payload = Option.Some(await res.json());
+        }
+        if (type === "text") {
+          payload = Option.Some(await res.text());
+        }
+      } catch {
+        payload = Option.None();
       }
-      if (onProgress != undefined) {
-        xhr.removeEventListener("progress", onProgress);
-      }
+
+      const status = res.status;
+      const ok = res.ok;
+
+      const response: Response<ResponseTypeMap[T]> = {
+        url,
+        status,
+        ok,
+        response: payload as Option<ResponseTypeMap[T]>,
+      };
+      return response;
     };
 
-    xhr.addEventListener("error", onError);
-    xhr.addEventListener("load", onLoad);
-    xhr.addEventListener("timeout", onTimeout);
-    if (onLoadStart != undefined) {
-      xhr.addEventListener("loadstart", onLoadStart);
-    }
-    if (onProgress != undefined) {
-      xhr.addEventListener("progress", onProgress);
-    }
+    init().then(
+      (response) => resolve(Result.Ok(response)),
+      (error) => {
+        if (error instanceof CanceledError) {
+          return resolvedPromise;
+        }
+        if (error instanceof TimeoutError) {
+          resolve(Result.Error(error));
+          return resolvedPromise;
+        }
+        resolve(Result.Error(new NetworkError(url)));
+        return resolvedPromise;
+      },
+    );
 
-    xhr.send(body);
-
-    // Given we're using a Boxed Future, we have cancellation for free!
     return () => {
-      cleanupEvents();
-      xhr.abort();
+      controller.abort(new CanceledError());
     };
   });
 };
