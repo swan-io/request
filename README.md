@@ -6,7 +6,7 @@
 [![npm version](https://img.shields.io/npm/v/@swan-io/request?style=for-the-badge)](https://www.npmjs.org/package/@swan-io/request)
 [![bundlephobia](https://img.shields.io/bundlephobia/minzip/@swan-io/request?label=size&style=for-the-badge)](https://bundlephobia.com/result?p=@swan-io/request)
 
-> Wrapper for XMLHttpRequest with better data-structures
+> Wrapper for fetch with better data-structures
 
 ## Installation
 
@@ -82,7 +82,6 @@ useEffect(() => {
 - `body`: request body
 - `headers`: a record containing the headers
 - `creatials`: `omit`, `same-origin` or `include`
-- `onLoadStart`: event triggered on load start
 - `timeout`: number
 
 #### Return value
