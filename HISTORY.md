@@ -1,3 +1,9 @@
+# 3.0.0
+
+## Changes
+
+- Replace `JsonValue` type with `unknown` (a32d964)
+
 # 2.0.0
 
 ## Changes
