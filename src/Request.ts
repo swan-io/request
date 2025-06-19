@@ -1,13 +1,5 @@
 import { Future, Option, Result } from "@swan-io/boxed";
 
-// Copied from type-fest, to avoid adding a dependency
-type JsonObject = { [Key in string]: JsonValue } & {
-  [Key in string]?: JsonValue | undefined;
-};
-type JsonArray = JsonValue[] | readonly JsonValue[];
-type JsonPrimitive = string | number | boolean | null;
-type JsonValue = JsonPrimitive | JsonObject | JsonArray;
-
 // The type system allows us infer the response type from the requested `responseType`
 type ResponseType = "text" | "arraybuffer" | "blob" | "json";
 
@@ -15,7 +7,7 @@ type ResponseTypeMap = {
   text: string;
   arraybuffer: ArrayBuffer;
   blob: Blob;
-  json: JsonValue;
+  json: unknown;
 };
 
 type Method = "GET" | "POST" | "OPTIONS" | "PATCH" | "PUT" | "DELETE";
