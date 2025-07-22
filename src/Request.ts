@@ -66,10 +66,11 @@ type Config<T extends ResponseType> = {
 };
 
 export type Response<T> = {
-  url: string;
   status: number;
   ok: boolean;
   response: Option<T>;
+  url: string;
+  headers: Headers;
 };
 
 const resolvedPromise = Promise.resolve();
@@ -141,13 +142,11 @@ const make = <T extends ResponseType>({
         payload = Option.None();
       }
 
-      const status = res.status;
-      const ok = res.ok;
-
       const response: Response<ResponseTypeMap[T]> = {
         url,
-        status,
-        ok,
+        status: res.status,
+        ok: res.ok,
+        headers: res.headers,
         response: payload as Option<ResponseTypeMap[T]>,
       };
       return response;
