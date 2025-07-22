@@ -1,3 +1,9 @@
+# 3.1.0
+
+## Features
+
+- Added `headers` next to response (bdf0104)
+
 # 3.0.0
 
 ## Changes
