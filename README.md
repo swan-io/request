@@ -92,6 +92,7 @@ Returns a `Future<Result<Response<T>, NetworkError | TimeoutError>>`, where `Res
 - `ok`: `boolean`
 - `response`: `Option<T>`
 - `url`: `string`
+- `headers`: `Headers`
 
 `T` is the type associated with the `responseType` provided in the `config` object.
 
